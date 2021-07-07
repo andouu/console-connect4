@@ -174,7 +174,6 @@ void initdfs(stack<pair<pair<int, int>, string>> &que, int (&sums)[4], vector<ve
             if(inRange(0, boardWidth-1, tmp_x) && inRange(0, boardHeight-1, tmp_y))
             if(board[tmp_y][tmp_x] == latPiece && boolArr[i][tmp_y][tmp_x] != 1)
             {
-                chain[i].push_back(make_pair(tmp_x, tmp_y));
                 que.push(make_pair(make_pair(tmp_x, tmp_y), indexMap[i]));
                 sums[i]++;
             }
@@ -188,6 +187,7 @@ bool hasWon(int latest)
     vector<vector<vector<int>>> hasBeenTo = {4, vector<vector<int>>(boardHeight, vector<int>(boardWidth, 0))};
     vector<vector<pair<int, int>>> sequences = {4, vector<pair<int, int>>()}; //keeps track of current connected sequences
     int sumArr[4] = {1, 1, 1, 1};
+    string lastCond = "";
     initdfs(queue, sumArr, hasBeenTo, sequences, latest);
 
     while(!queue.empty())
@@ -207,15 +207,16 @@ bool hasWon(int latest)
                 if(board[tmp_y][tmp_x] == piece && hasBeenTo[conditionLink[cond]][tmp_y][tmp_x] != 1)
                 {
                     queue.push(make_pair(make_pair(tmp_x, tmp_y), cond));
-                    sequences[conditionLink[cond]].push_back(make_pair(tmp_x, tmp_y));
                     sumArr[conditionLink[cond]]++;
-                    if(sumArr[conditionLink[cond]] >= 4)
-                    {
-                        strikeThrough(sequences[conditionLink[cond]], conditionLink[cond], currTurn);
-                        return true;
-                    }
                 }
-        }   
+        }
+        lastCond = cond;   
+    }
+
+    if(sumArr[conditionLink[lastCond]] >= 4)
+    {
+        strikeThrough(sequences[conditionLink[lastCond]], conditionLink[lastCond], currTurn);
+        return true;
     }
 
     //check if all pieces have been played; if yes and the previous checks have returned false, then the game is a tie.
