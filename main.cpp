@@ -19,6 +19,7 @@ const int boardWidth = 7;
 const int boardHeight = 6;
 const char arrColors[2] = {'r', 'y'}; //represents the player colors.
 const string colors[2] = {"\033[31mRed\033[m", "\033[33mYellow\033[m"}; //same as arrColors, but I was too lazy to type ternaries so made this for printing convenience.
+const string colorPrefixes[2] = {"\033[31m", "\033[33m"}; //what am I doing anymore
 
 static string board[boardHeight][boardWidth];
 static int boardCapacity[boardWidth];
@@ -44,20 +45,24 @@ void deepPrint(int board[boardHeight][boardWidth], int width, int height) //prin
 
 void printBoard(string board[boardHeight][boardWidth], int width, int height)
 {
+    string YELLOW = "\033[33m";
+    string RED = "\033[31m";
+    string END = "\033[m";
     cout << string(width*4+1, '-') << endl;
-
+    
     for(int i=0; i<height; i++)
     {
         cout << "| ";
         for(int j=0; j<width; j++)
         {
             string p;
-            if(board[i][j] != "")
+            string curr = board[i][j];
+            if(curr != "")
             {
-                if(board[i][j] == "r")
-                    p = "\033[31mr\033[m"; //COLORED TEXT BABYY https://medium.com/@vitorcosta.matias/print-coloured-texts-in-console-a0db6f589138
+                if(curr != "r" && curr != "y")
+                    p = colorPrefixes[(currTurn-1)%2] + curr + END; //COLORED TEXT BABYY https://medium.com/@vitorcosta.matias/print-coloured-texts-in-console-a0db6f589138
                 else
-                    p = "\033[33my\033[m";
+                    (curr == "r") ? p = RED + "r" + END : p = YELLOW + "y" + END;
             }
             else
                 p = ' ';
@@ -108,12 +113,28 @@ void strikeThrough(vector<pair<int, int>> &chain, int condition, int currTurn)
     string escStart = "\033[" + color + "m";
     string escEnd = "\033[m";
     (currTurn%2 == 0) ? color = "31" : color = "33";
+
+    switch(condition)
+    {
+        case 0:
+            to = "/";
+            break;
+        case 1:
+            to = "\\";
+            break;
+        case 2:
+            to = "-";
+            break;
+        case 3:
+            to = "|";
+            break;
+    }
     
     while(!chain.empty())
     {
         int tmp_x = chain.back().first;
         int tmp_y = chain.back().second;
-        board[tmp_y][tmp_x] = "br";
+        board[tmp_y][tmp_x] = to;
         DEBUG(tmp_x);
         DEBUG(tmp_y);
         chain.pop_back();
