@@ -30,7 +30,7 @@ int currTurn = 0; //even = red's turn, odd = yellow's turn
 
 bool gameEnded = false;
 
-void deepPrint(int board[boardHeight][boardWidth], int width, int height) //prints 2d array.
+void deepPrint(string board[boardHeight][boardWidth], int width, int height) //prints 2d array.
 {
     cout << "[ ";
     for(int i=0; i<height; i++)
@@ -187,7 +187,6 @@ bool hasWon(int latest)
     vector<vector<vector<int>>> hasBeenTo = {4, vector<vector<int>>(boardHeight, vector<int>(boardWidth, 0))};
     vector<vector<pair<int, int>>> sequences = {4, vector<pair<int, int>>()}; //keeps track of current connected sequences
     int sumArr[4] = {1, 1, 1, 1};
-    string lastCond = "";
     initdfs(queue, sumArr, hasBeenTo, sequences, latest);
 
     while(!queue.empty())
@@ -210,13 +209,15 @@ bool hasWon(int latest)
                     sumArr[conditionLink[cond]]++;
                 }
         }
-        lastCond = cond;   
     }
 
-    if(sumArr[conditionLink[lastCond]] >= 4)
+    for(int i=0; i<4; i++)
     {
-        strikeThrough(sequences[conditionLink[lastCond]], conditionLink[lastCond], currTurn);
-        return true;
+        if(sumArr[i] >= 4)
+        {
+            strikeThrough(sequences[conditionLink[indexMap[i]]], conditionLink[indexMap[i]], currTurn);
+            return true;
+        }
     }
 
     //check if all pieces have been played; if yes and the previous checks have returned false, then the game is a tie.
